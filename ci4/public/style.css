@@ -1,0 +1,158 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  line-height: 1.6;
+  font-size: 100%;
+  font-family: 'Open Sans', sans-serif;
+  color: #5a5a5a;
+  background: #f7f7f7;
+}
+#container {
+  width: 980px;
+  margin: 30px auto;
+  box-shadow: 0 0 1em #cccccc;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+
+header {
+  padding: 30px 20px 20px 20px;
+  background: #f2f2f2;
+  border-bottom: 1px solid #e0e0e0;
+}
+header h1 {
+  margin: 0;
+  color: #1f5faa;
+  font-size: 2.2em;
+  letter-spacing: 1px;
+}
+
+
+nav {
+  background-color: #1f5faa;
+}
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+nav li {
+  display: inline-block;
+}
+nav a {
+  padding: 15px 30px;
+  display: inline-block;
+  color: #fff;
+  font-size: 15px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+nav a.active,
+nav a:hover {
+  background-color: #2b83ea;
+}
+
+
+#wrapper {
+  display: flex;
+  min-height: 500px;
+  background: #fff;
+}
+#main {
+  flex: 3;
+  padding: 30px 30px 30px 30px;
+}
+#sidebar {
+  flex: 1;
+  background: #f9f9f9;
+  border-left: 1px solid #ececec;
+  padding: 30px 20px;
+}
+
+.widget-box {
+  margin-bottom: 30px;
+  padding: 18px 15px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(200,200,200,0.07);
+}
+.widget-box h3 {
+  color: #1f5faa;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 6px;
+}
+.widget-box ul {
+  list-style: disc inside;
+  margin-left: 12px;
+}
+.widget-box li {
+  margin-bottom: 8px;
+}
+.widget-box a {
+  color: #0275d8;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.widget-box a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+.widget-box p {
+  color: #666;
+  font-size: 1em;
+}
+
+
+h2 {
+  margin-top: 20px;
+  margin-bottom: 15px;
+  color: #1f5faa;
+  font-size: 1.5em;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 6px;
+}
+
+
+footer {
+  background-color: #1d1d1d;
+  padding: 20px;
+  color: #eee;
+  text-align: center;
+  font-size: 1em;
+  letter-spacing: 1px;
+  border-top: 1px solid #222;
+}
+
+
+a:active,
+a:hover {
+  opacity: 80%;
+}
+
+
+@media (max-width: 1100px) {
+  #container {
+      width: 98%;
+  }
+}
+@media (max-width: 800px) {
+  #wrapper {
+      flex-direction: column;
+  }
+  #main, #sidebar {
+      padding: 20px 10px;
+  }
+  #sidebar {
+      border-left: none;
+      border-top: 1px solid #ececec;
+  }
+}
