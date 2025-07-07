@@ -709,7 +709,7 @@ h3#form-title {
 
 ## Dokumentasi Hasil Akhir
 
-![vuejs](img/vuejs.gif)
+![vuejs](lab11/vuejs.gif)
 
 Tampilan akhir **Lab11Web** menampilkan dashboard pengelolaan artikel berbasis **Vue.js** yang terintegrasi dengan REST API. Pengguna dapat:
 
