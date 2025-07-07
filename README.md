@@ -149,7 +149,9 @@ class Post extends ResourceController
     }
 }
 ```
+seperti pada gambar berikut ini !
 
+![Post](lab11/post.png)
 
 
 Controller ini memiliki lima fungsi utama:
@@ -170,32 +172,46 @@ Tambahkan kode berikut pada file `app/Config/Routes.php`:
 $routes->resource('post');
 ```
 
+![routes](lab11/routes.png)
+
 Gunakan perintah:
 
 ```bash
 php spark routes
 ```
 
+![routes1](lab11/routes1.png)
+
 Untuk melihat daftar lengkap endpoint yang dihasilkan.
 
 ---
 
 ### Pengujian REST API dengan Postman
+Buka aplikasi postman dan pilih create new → HTTP Request
+
+![Postman](lab11/postman.png)
+
 
 1. **Menampilkan Semua Artikel**
 
    * Method: GET
    * URL: `http://localhost:8080/post`
+     
+![ss1](lab11/ss1.png)
 
 2. **Menampilkan Artikel Spesifik**
 
    * Method: GET
    * URL: `http://localhost:8080/post/{id}`
+     
+![ss2](lab11/ss2.png)
 
 3. **Menambahkan Artikel**
 
    * Method: POST
    * URL: `http://localhost:8080/post`
+     
+![ss3](lab11/ss3.png)
 
 4. **Mengubah Artikel**
 
@@ -206,7 +222,8 @@ Untuk melihat daftar lengkap endpoint yang dihasilkan.
 
    * Method: DELETE
    * URL: `http://localhost:8080/post/{id}`
-
+     
+![ss4](lab11/ss4.png)
 ---
 
 ## Praktikum Vue.js
