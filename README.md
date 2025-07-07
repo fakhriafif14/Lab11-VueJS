@@ -239,18 +239,254 @@ lab11_vuejs/
 ## Tampilan Data Artikel dengan Vue.js
 
 ### index.html
-
 Berisi struktur utama halaman, tombol tambah data, modal form artikel, serta tabel daftar artikel.
+#### File index.html
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Artikel VueJS</title>
+    <!-- CDN untuk VueJS 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- CDN untuk Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- Link ke CSS kustom -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <h1>Daftar Artikel</h1>
 
+        <!-- Tombol Tambah Data -->
+        <button id="btn-tambah" @click="tambah">Tambah Data</button>
+
+        <!-- Modal Form Tambah dan Ubah Data -->
+        <div class="modal" v-if="showForm">
+            <div class="modal-content">
+                <span class="close" @click="showForm = false">&times;</span>
+                <form id="form-data" @submit.prevent="saveData">
+                    <h3 id="form-title">{{ formTitle }}</h3>
+                    <div>
+                        <label for="judul" class="form-label">Judul Artikel</label> <!-- Label untuk Judul -->
+                        <input type="text" name="judul" id="judul" v-model="formData.judul" placeholder="Judul" required>
+                    </div>
+                    <div>
+                        <label for="isi" class="form-label">Isi Artikel</label> <!-- Label untuk Isi -->
+                        <textarea name="isi" id="isi" rows="10" v-model="formData.isi" placeholder="Isi Artikel"></textarea>
+                    </div>
+                    <div>
+                        <label for="status" class="form-label">Status</label> <!-- Label untuk Status -->
+                        <select name="status" id="status" v-model="formData.status">
+                            <option v-for="option in statusOptions" :value="option.value" :key="option.value">
+                                {{ option.text }}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- Hidden input untuk ID artikel saat edit -->
+                    <input type="hidden" id="id" v-model="formData.id">
+                    <button type="submit" id="btnSimpan">Simpan</button>
+                    <button type="button" @click="showForm = false">Batal</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabel untuk menampilkan data artikel -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Judul</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loop melalui array artikel -->
+                <tr v-for="(row, index) in artikel" :key="row.id">
+                    <td class="center-text">{{ row.id }}</td>
+                    <td>{{ row.judul }}</td>
+                    <td>{{ statusText(row.status) }}</td>
+                    <td class="center-text">
+                        <a href="#" @click.prevent="edit(row)">Edit</a>
+                        <a href="#" @click.prevent="hapus(index, row.id)">Hapus</a>
+                    </td>
+                </tr>
+                <tr v-if="artikel.length === 0">
+                    <td colspan="4" class="center-text">Tidak ada artikel tersedia.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Link ke JavaScript aplikasi VueJS kita -->
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
+```
 ### app.js
 
 Mengatur seluruh logika Vue:
-
 * Memuat data dari API menggunakan `axios.get`.
 * Menampilkan data artikel di tabel.
 * Formulir dinamis untuk tambah/ubah data.
 * Fungsi hapus artikel menggunakan `axios.delete`.
 * Real-time update tanpa reload halaman.
+
+#### File app.js
+```javascript
+const { createApp } = Vue;
+
+// Tentukan lokasi API REST End Point Anda
+// Contoh: 'http://localhost:8080/post' jika Anda mengaksesnya langsung
+// atau 'http://localhost/labci4/public/post' jika public bukan root
+const apiUrl = 'http://localhost/Lab11_ci/ci4/public/post'; // Sesuaikan ini dengan URL API Anda!
+
+createApp({
+    data() {
+        return {
+            artikel: [], // Array untuk menyimpan data artikel
+            
+            // Objek untuk data form (digunakan untuk tambah dan ubah)
+            formData: {
+                id: null,
+                judul: '',
+                isi: '',
+                status: 0 // Default status (misal: 0 untuk Draft)
+            },
+            
+            showForm: false, // Kontrol tampilan modal form
+            formTitle: 'Tambah Data', // Judul modal form
+            
+            // Opsi untuk dropdown status
+            statusOptions: [
+                {text: 'Draft', value: 0}, // Sesuaikan value dengan kolom status di DB (0/1 atau 'Draft'/'published')
+                {text: 'Publish', value: 1} // Jika status di DB Anda adalah string 'Draft'/'published', gunakan itu sebagai value
+            ],
+        };
+    },
+    
+    // Dipanggil saat instance Vue selesai di-mount
+    mounted() {
+        this.loadData();
+    },
+    
+    methods: {
+        // Fungsi untuk memuat data artikel dari API
+        loadData() {
+            axios.get(apiUrl)
+                .then(response => {
+                    // Jika API mengembalikan { artikel: [...] }, akses response.data.artikel
+                    // Jika API hanya mengembalikan [...], akses response.data
+                    this.artikel = response.data.artikel || response.data; 
+                    console.log("Data artikel dimuat:", this.artikel);
+                })
+                .catch(error => {
+                    console.error("Error memuat data:", error);
+                    alert("Gagal memuat data artikel. Cek konsol untuk detail.");
+                });
+        },
+        
+        // Fungsi untuk mengubah tampilan status (dari angka/boolean ke teks)
+        statusText(status) {
+            // Sesuaikan logika ini dengan bagaimana status disimpan di database Anda
+            // Jika di DB adalah '0' atau '1' (string/number)
+            if (status == 1 || status == '1' || status === 'published') {
+                return 'Publish';
+            } else if (status == 0 || status == '0' || status === 'Draft') {
+                return 'Draft';
+            }
+            return ''; // Default jika status tidak dikenali
+        },
+        
+        // Fungsi untuk menampilkan form tambah data
+        tambah() {
+            this.showForm = true;
+            this.formTitle = 'Tambah Data';
+            // Reset formData agar kosong untuk entri baru
+            this.formData = {
+                id: null,
+                judul: '',
+                isi: '',
+                status: 0 // Default status untuk form tambah
+            };
+        },
+        
+        // Fungsi untuk menghapus artikel
+        hapus(index, id) {
+            if (confirm('Yakin ingin menghapus data ini?')) {
+                axios.delete(apiUrl + '/' + id)
+                    .then(response => {
+                        alert(response.data.messages.success); // Tampilkan pesan sukses dari API
+                        this.artikel.splice(index, 1); // Hapus item dari array di frontend
+                        // Alternatif: this.loadData(); // Memuat ulang semua data dari server
+                    })
+                    .catch(error => {
+                        console.error("Error menghapus data:", error.response || error);
+                        alert("Gagal menghapus artikel: " + (error.response?.data?.messages?.error || error.message || "Terjadi kesalahan."));
+                    });
+            }
+        },
+        
+        // Fungsi untuk mengisi form dengan data artikel yang akan diubah
+        edit(data) {
+            this.showForm = true;
+            this.formTitle = 'Ubah Data';
+            // Isi formData dengan data dari baris yang dipilih
+            this.formData = {
+                id: data.id,
+                judul: data.judul,
+                isi: data.isi,
+                // Pastikan status sesuai dengan value di statusOptions (misal: 0 atau 1)
+                status: data.status == 'published' ? 1 : (data.status == 'Draft' ? 0 : data.status)
+            };
+            console.log("Mengedit item:", this.formData);
+        },
+        
+        // Fungsi untuk menyimpan atau mengubah data (dipanggil saat form disubmit)
+        saveData() {
+            // Jika formData.id ada, berarti ini adalah operasi ubah (PUT)
+            if (this.formData.id) {
+                axios.put(apiUrl + '/' + this.formData.id, this.formData)
+                    .then(response => {
+                        alert(response.data.messages.success || "Artikel berhasil diubah!");
+                        this.loadData(); // Muat ulang data setelah perubahan
+                        this.showForm = false; // Sembunyikan form
+                        console.log('Item diperbarui:', response.data);
+                    })
+                    .catch(error => {
+                        console.error("Error memperbarui item:", error.response || error);
+                        alert("Gagal mengubah artikel: " + (error.response?.data?.messages?.error || error.message || "Terjadi kesalahan."));
+                    });
+            } else {
+                // Jika formData.id null, berarti ini adalah operasi tambah (POST)
+                axios.post(apiUrl, this.formData)
+                    .then(response => {
+                        alert(response.data.messages.success || "Artikel berhasil ditambahkan!");
+                        this.loadData(); // Muat ulang data setelah penambahan
+                        this.showForm = false; // Sembunyikan form
+                        console.log('Item ditambahkan:', response.data);
+                    })
+                    .catch(error => {
+                        console.error("Error menambahkan item:", error.response || error);
+                        alert("Gagal menambahkan artikel: " + (error.response?.data?.messages?.error || error.message || "Terjadi kesalahan."));
+                    });
+            }
+            
+            // Reset form data setelah operasi selesai (atau di dalam then/catch block)
+            this.formData = {
+                id: null,
+                judul: '',
+                isi: '',
+                status: 0
+            };
+        },
+    },
+}).mount('#app'); // Mount aplikasi Vue ke elemen dengan id "app"
+```
+
+<br>
 
 ### style.css
 
@@ -259,6 +495,198 @@ Mengatur tata letak dan desain:
 * Tabel artikel dengan tampilan rapi.
 * Form input dalam modal yang responsif.
 * Tombol interaktif untuk tambah, simpan, dan batal.
+#### File style.css
+```css
+/* Styling dasar untuk aplikasi VueJS */
+#app {
+    margin: 0 auto;
+    width: 900px;
+    padding: 20px; /* Tambahkan padding agar tidak terlalu mepet */
+    font-family: sans-serif; /* Atur font-family */
+}
+
+h1 {
+    text-align: center;
+    color: #3152d6;
+    margin-bottom: 20px;
+}
+
+table {
+    min-width: 700px;
+    width: 100%;
+    border-collapse: collapse; /* Hilangkan jarak antar border cell */
+    margin-top: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Tambahkan sedikit bayangan */
+    border-radius: 8px; /* Sudut membulat */
+    overflow: hidden; /* Pastikan sudut membulat diterapkan */
+}
+
+th {
+    padding: 12px 10px;
+    background: #5778ff !important;
+    color: #ffffff;
+    text-align: left; /* Atur teks ke kiri */
+}
+
+tr td {
+    border-bottom: 1px solid #eff1ff;
+    padding: 10px;
+}
+
+tr:nth-child(odd) {
+    background-color: #eff1ff;
+}
+
+td {
+    padding: 10px;
+}
+
+.center-text {
+    text-align: center;
+}
+
+td a {
+    margin: 0 5px; /* Sesuaikan margin untuk link aksi */
+    text-decoration: none; /* Hilangkan underline */
+    color: #3152d6; /* Warna link */
+}
+
+td a:hover {
+    text-decoration: underline; /* Munculkan underline saat hover */
+}
+
+/* Styling untuk form */
+#form-data {
+    width: 100%; /* Lebar form menyesuaikan modal-content */
+}
+
+form input,
+form select,
+form textarea {
+    width: 100%;
+    margin-bottom: 10px; /* Tambahkan margin-bottom */
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px; /* Sudut membulat */
+}
+
+form div {
+    margin-bottom: 10px; /* Sesuaikan margin-bottom untuk setiap div form */
+    position: relative;
+}
+
+form button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px; /* Sudut membulat */
+    font-weight: bold;
+    transition: background-color 0.3s ease; /* Transisi halus */
+}
+
+#btn-tambah {
+    margin-bottom: 15px;
+    padding: 12px 25px;
+    cursor: pointer;
+    background-color: #28a745; /* Warna hijau untuk tambah */
+    color: #ffffff;
+    border: 1px solid #28a745;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+#btn-tambah:hover {
+    background-color: #218838;
+}
+
+#btnSimpan {
+    background-color: #3152d6;
+    color: #ffffff;
+    border: 1px solid #3152d6;
+}
+
+#btnSimpan:hover {
+    background-color: #2640aa;
+}
+
+form button[type="button"] { /* Untuk tombol Batal */
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+form button[type="button"]:hover {
+    background-color: #5a6268;
+}
+
+/* Styling Modal */
+.modal {
+    display: block; /* Default to block for v-if to toggle */
+    position: fixed;
+    z-index: 1000; /* Pastikan modal di atas konten lain */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6); /* Lebih gelap sedikit dari modul */
+    display: flex; /* Gunakan flexbox untuk centering */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 30px; /* Tambah padding */
+    border: 1px solid #888;
+    width: 90%; /* Responsif */
+    max-width: 600px; /* Batasi lebar maksimum */
+    border-radius: 8px; /* Sudut membulat */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Bayangan lebih kuat */
+    position: relative; /* Untuk posisi tombol close */
+}
+
+.close {
+    color: #aaa;
+    float: right; /* Atur float untuk tombol close */
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; /* Posisi absolut di dalam modal-content */
+    top: 10px;
+    right: 15px;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+h3#form-title {
+    text-align: center;
+    color: #3152d6;
+    margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #app {
+        width: 100%;
+        padding: 10px;
+    }
+    table {
+        font-size: 0.9em;
+    }
+    th, td {
+        padding: 8px;
+    }
+}
+```
 
 ---
 
