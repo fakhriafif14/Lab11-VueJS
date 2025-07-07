@@ -710,10 +710,13 @@ h3#form-title {
 ## Dokumentasi Hasil Akhir
 ![add](lab11/add.png)
 ![add1](lab11/add1.png)
+
 ![edit](lab11/edit.png)
 ![edit1](lab11/edit1.png)
+
 ![delete](lab11/delete.png)
 ![delete1](lab11/delete1.png)
+
 ![vuejs](lab11/vuejs.gif)
 
 Tampilan akhir **Lab11Web** menampilkan dashboard pengelolaan artikel berbasis **Vue.js** yang terintegrasi dengan REST API. Pengguna dapat:
@@ -726,4 +729,3 @@ Tampilan akhir **Lab11Web** menampilkan dashboard pengelolaan artikel berbasis *
 
 ---
 
-Kalau mau saya buatkan dalam format *markdown* siap tempel ke GitHub atau *PDF* untuk laporan, tinggal bilang saja!
